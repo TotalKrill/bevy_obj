@@ -1,10 +1,10 @@
 use anyhow::Result;
-use bevy_asset::{AssetLoader, LoadContext, LoadedAsset};
-use bevy_render::{
+use bevy::asset::{AssetLoader, LoadContext, LoadedAsset};
+use bevy::render::{
     mesh::{Indices, Mesh, VertexAttributeValues},
     pipeline::PrimitiveTopology,
 };
-use bevy_utils::BoxedFuture;
+use bevy::utils::BoxedFuture;
 use thiserror::Error;
 
 #[derive(Default)]
@@ -14,7 +14,7 @@ impl AssetLoader for ObjLoader {
     fn load<'a>(
         &'a self,
         bytes: &'a [u8],
-        load_context: &'a mut bevy_asset::LoadContext,
+        load_context: &'a mut bevy::asset::LoadContext,
     ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
         Box::pin(async move { Ok(load_obj(bytes, load_context).await?) })
     }
@@ -69,7 +69,6 @@ fn load_obj_from_bytes(bytes: &[u8], mesh: &mut Mesh) -> Result<(), ObjError> {
             set_mesh_indices(mesh, obj);
         }
         2 => {
-
             let obj: obj::Obj<obj::Vertex, u32> = obj::Obj::new(raw)?;
             set_position_data(mesh, obj.vertices.iter().map(|v| v.position).collect());
             set_normal_data(mesh, obj.vertices.iter().map(|v| v.normal).collect());
@@ -77,7 +76,6 @@ fn load_obj_from_bytes(bytes: &[u8], mesh: &mut Mesh) -> Result<(), ObjError> {
             set_mesh_indices(mesh, obj);
         }
         3 => {
-
             let obj: obj::Obj<obj::TexturedVertex, u32> = obj::Obj::new(raw)?;
             set_position_data(mesh, obj.vertices.iter().map(|v| v.position).collect());
             set_normal_data(mesh, obj.vertices.iter().map(|v| v.normal).collect());
@@ -98,17 +96,17 @@ fn load_obj_from_bytes(bytes: &[u8], mesh: &mut Mesh) -> Result<(), ObjError> {
 }
 
 fn set_position_data(mesh: &mut Mesh, data: Vec<[f32; 3]>) {
-    let positions = VertexAttributeValues::Float3(data);
+    let positions = VertexAttributeValues::Float32x3(data);
     mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, positions);
 }
 
 fn set_normal_data(mesh: &mut Mesh, data: Vec<[f32; 3]>) {
-    let normals = VertexAttributeValues::Float3(data);
+    let normals = VertexAttributeValues::Float32x3(data);
     mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
 }
 
 fn set_uv_data(mesh: &mut Mesh, data: Vec<[f32; 3]>) {
-    let uvs = VertexAttributeValues::Float3(data);
+    let uvs = VertexAttributeValues::Float32x3(data);
     mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
 }
 
